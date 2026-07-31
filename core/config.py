@@ -6,6 +6,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 class Settings(BaseSettings):
     DATABASE_URL: str
+    HOST: str
+    PORT: int
 
 
 
