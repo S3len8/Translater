@@ -1,11 +1,9 @@
 import httpx
 import pyperclip
-from services.translate import TranslateService
-from routers.translate import get_translate
 
 class Translate:
-    def __init__(self, service: TranslateService):
-        self.service = service
+    def __init__(self):
+        pass
 
     async def translate(self):
         text_to_translate = pyperclip.paste().strip()
@@ -29,4 +27,16 @@ class Translate:
                 result = "".join([part[0] for part in data[0] if part[0]])
                 print(result)
                 if result:
-                    await self.service.is_translated(word=text_to_translate, translation=result, transcription=None)
+                    payload = {
+                        "word": text_to_translate,
+                        "translation": result,
+                        "transcription": None,
+                    }
+
+                    async with httpx.AsyncClient(
+                            base_url="http://127.0.0.1:8888",
+                            timeout=5,
+                    ) as client_2:
+                        response = await client_2.post("/history", params=payload)
+                        response.raise_for_status()
+                        return response.json()

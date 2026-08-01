@@ -1,5 +1,8 @@
 from fastapi import HTTPException, status
 from repositories.history import HistoryRepository
+from clients.translate import Translate
+
+translate_google = Translate()
 
 
 class TranslateService:
@@ -25,3 +28,12 @@ class TranslateService:
             transcription=transcription)
         print(word_database)
         return word_database
+
+    async def translate_word(self, word: str):
+        if not word or not word.strip():
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Word not found",
+            )
+        result = await translate_google.translate()
+        return result 

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 from core.postgre import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
 from repositories.history import HistoryRepository
@@ -11,7 +11,7 @@ def translate_service(db: AsyncSession = Depends(get_db)) -> TranslateService:
     repository = HistoryRepository(db)
     return TranslateService(repository)
 
-@router.post("/translate", response_model=TranslateResponse)
+@router.post("/history", response_model=TranslateResponse)
 async def get_translate(
         word: str,
         translation: str,
@@ -19,3 +19,16 @@ async def get_translate(
         service: TranslateService = Depends(translate_service)
 ):
     return await service.is_translated(word=word, translation=translation, transcription=transcription)
+
+
+@router.post("/translate", response_model=TranslateRequest)
+async def translate(
+        word: str,
+        service: TranslateService = Depends(translate_service)
+):
+    result = await service.translate_word(word=word)
+    return result
+    # return {
+    #     "word": word,
+    #     "result:": status.HTTP_200_OK,
+    # }
