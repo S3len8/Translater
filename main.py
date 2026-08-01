@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 import uvicorn
 from core.config import Settings
-from routers.translate import router
+from routers import translate, export
 from core.listeners import start_listening, stop_listening
 import asyncio
 
@@ -24,7 +24,8 @@ app = FastAPI(
     lifespan=lifespan
 )
 settings = Settings()
-app.include_router(router)
+app.include_router(translate.router)
+app.include_router(export.router)
 
 
 if __name__ == "__main__":
