@@ -1,4 +1,4 @@
-from models.base import Base, IDMixin, TimestampMixin
+from backend.models.base import Base, IDMixin, TimestampMixin
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import String
 

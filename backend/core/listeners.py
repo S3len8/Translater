@@ -35,7 +35,7 @@ async def send_to_endpoint1(word: str) -> dict:
     async with httpx.AsyncClient(
         base_url=ENDPOINT1_URL,
     ) as client:
-        response = await client.post("/translate", params={"word": word})
+        response = await client.post("/translate", json={"word": word})
         response.raise_for_status()
         if response.is_error:
             print(response.text)

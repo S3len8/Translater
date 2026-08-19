@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
-from core.postgre import get_db
+from backend.core.postgre import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
-from repositories.export import ExportRepository
-from services.export import ExportService
+from backend.repositories.export import ExportRepository
+from backend.services.export import ExportService
 
 
 router = APIRouter()

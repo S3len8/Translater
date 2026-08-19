@@ -1,9 +1,10 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 import uvicorn
-from core.config import Settings
-from routers import translate, export
-from core.listeners import start_listening, stop_listening
+from backend.core.config import Settings
+from backend.routers import translate, export
+from backend.routers import history
+from backend.core.listeners import start_listening, stop_listening
 import asyncio
 
 
@@ -26,7 +27,7 @@ app = FastAPI(
 settings = Settings()
 app.include_router(translate.router)
 app.include_router(export.router)
-
+app.include_router(history.router)
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host=settings.HOST, port=settings.PORT, reload=True)
+    uvicorn.run("backend.main:app", host=settings.HOST, port=settings.PORT, reload=True)

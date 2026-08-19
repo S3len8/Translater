@@ -1,5 +1,5 @@
 from typing import Sequence
-from models.history import TranslationHistory
+from backend.models.history import TranslationHistory
 from sqlalchemy import select, RowMapping
 
 class ExportRepository:

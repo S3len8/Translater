@@ -1,19 +1,18 @@
 import httpx
-import pyperclip
+from backend.schemas.translate import TranslationResult
 
 class Translate:
     def __init__(self):
         pass
 
-    async def translate(self):
-        text_to_translate = pyperclip.paste().strip()
+    async def translate(self, word):
         url = "https://translate.googleapis.com/translate_a/single"
         params = {
             "client": "gtx",
             "sl": "auto",
             "tl": "uk",
             "dt": "t",
-            "q": text_to_translate,
+            "q": word,
         }
 
         headers = {
@@ -27,16 +26,9 @@ class Translate:
                 result = "".join([part[0] for part in data[0] if part[0]])
                 print(result)
                 if result:
-                    payload = {
-                        "word": text_to_translate,
-                        "translation": result,
-                        "transcription": None,
-                    }
-
-                    async with httpx.AsyncClient(
-                            base_url="http://127.0.0.1:8888",
-                            timeout=5,
-                    ) as client_2:
-                        response = await client_2.post("/history", params=payload)
-                        response.raise_for_status()
-                        return response.json()
+                    payload = TranslationResult(
+                        word=word,
+                        translation=result,
+                        transcription=None,
+                    )
+                    return payload

@@ -1,6 +1,6 @@
 from io import BytesIO
 from fastapi import HTTPException, status
-from repositories.export import ExportRepository
+from backend.repositories.export import ExportRepository
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, Font, PatternFill
 
