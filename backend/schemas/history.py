@@ -5,6 +5,7 @@ class HistoryResponse(BaseModel):
     word: str
     translation: str
     transcription: str | None = None
+    score: int
 
     model_config = ConfigDict(from_attributes=True)
 

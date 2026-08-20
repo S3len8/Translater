@@ -20,14 +20,15 @@ class ExportService:
         worksheet = workbook.active
         worksheet.title = "Translations"
 
-        headers = ["Word", "Translation", "Transcription"]
+        headers = ["Word", "Translation", "Transcription", "Score"]
         worksheet.append(headers)
 
         for history in histories:
             worksheet.append([
                 history.get("word"),
                 history.get("translation"),
-                history.get("transcription")
+                history.get("transcription"),
+                history.get("score"),
             ])
 
         header_fill = PatternFill(
@@ -50,6 +51,7 @@ class ExportService:
         worksheet.column_dimensions["A"].width = 25
         worksheet.column_dimensions["B"].width = 35
         worksheet.column_dimensions["C"].width = 25
+        worksheet.column_dimensions["D"].width = 12
 
         worksheet.freeze_panes = "A2"
         worksheet.auto_filter.ref = worksheet.dimensions
