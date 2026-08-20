@@ -2,3 +2,4 @@
 .idea
 backend/.env
 backend/alembic.ini
+__pycache__/

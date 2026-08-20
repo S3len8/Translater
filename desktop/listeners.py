@@ -1,13 +1,10 @@
 import asyncio
 import math
 import time
-import httpx
 import pyperclip
 from pynput import keyboard, mouse
 from pynput.keyboard import Key, KeyCode
-
-
-ENDPOINT1_URL = "http://127.0.0.1:8888"
+from desktop.client import send_to_endpoint1, handle_endpoint1_result 
 
 x_start = 0
 y_start = 0
@@ -18,40 +15,15 @@ is_pressed_ctrl = False
 keyboard_ls = None
 mouse_ls = None
 
-
 def on_key_press(key):
     global is_pressed_ctrl
     if key in (Key.ctrl_l, Key.ctrl_r):
         is_pressed_ctrl = True
 
-
 def on_key_release(key):
     global is_pressed_ctrl
     if key in (Key.ctrl_l, Key.ctrl_r):
         is_pressed_ctrl = False
-
-
-async def send_to_endpoint1(word: str) -> dict:
-    async with httpx.AsyncClient(
-        base_url=ENDPOINT1_URL,
-    ) as client:
-        response = await client.post("/translate", json={"word": word})
-        response.raise_for_status()
-        if response.is_error:
-            print(response.text)
-
-        response.raise_for_status()
-        return response.json()
-
-
-def handle_endpoint1_result(future):
-    try:
-        result = future.result()
-    except Exception as error:
-        print(f"Помилка передачі слова на Endpoint 1: {error}")
-    else:
-        print(f"Endpoint 1 отримав слово: {result}")
-
 
 def on_click_mouse(x, y, button, pressed, loop):
     global x_start, y_start, is_dragging
@@ -98,10 +70,8 @@ def on_click_mouse(x, y, button, pressed, loop):
     )
     future.add_done_callback(handle_endpoint1_result)
 
-
 def on_move_mouse(x, y):
     pass
-
 
 def start_listening(loop):
     global keyboard_ls, mouse_ls
@@ -123,7 +93,6 @@ def start_listening(loop):
 
     keyboard_ls.start()
     mouse_ls.start()
-
 
 def stop_listening():
     global keyboard_ls, mouse_ls
