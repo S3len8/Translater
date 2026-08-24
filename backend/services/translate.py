@@ -1,8 +1,12 @@
 from fastapi import HTTPException, status
-from backend.clients.translate import Translate
+from backend.clients.translate import (
+    Translate,
+    TranslationInputTooLongError,
+    TranslationProviderError,
+)
 from backend.repositories.translate import TranslateRepository
 
-translate_google = Translate()
+translate_mymemory = Translate()
 
 
 class TranslateService:
@@ -24,7 +28,20 @@ class TranslateService:
             updated_word = await self.repository.increment_count(word=normalized_word)
             return updated_word
 
-        translated_word = await translate_google.translate(word=normalized_word)
+        try:
+            translated_word = await translate_mymemory.translate(
+                word=normalized_word
+            )
+        except TranslationInputTooLongError as error:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=str(error),
+            ) from error
+        except TranslationProviderError as error:
+            raise HTTPException(
+                status_code=status.HTTP_502_BAD_GATEWAY,
+                detail="Translation provider unavailable",
+            ) from error
 
         result = await self.repository.create_translate(
             word=normalized_word,

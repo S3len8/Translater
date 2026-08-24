@@ -1,34 +1,64 @@
 import httpx
 from backend.schemas.translate import TranslationResult
 
+
+MYMEMORY_TRANSLATE_URL = "https://api.mymemory.translated.net/get"
+MYMEMORY_LANG_PAIR = "en|uk"
+MYMEMORY_MAX_QUERY_BYTES = 500
+
+
+class TranslationProviderError(Exception):
+    """Raised when the translation provider cannot return a translation."""
+
+
+class TranslationInputTooLongError(ValueError):
+    """Raised when the text exceeds MyMemory's query size limit."""
+
+
 class Translate:
-    def __init__(self):
-        pass
+    async def translate(self, word: str) -> TranslationResult:
+        if len(word.encode("utf-8")) > MYMEMORY_MAX_QUERY_BYTES:
+            raise TranslationInputTooLongError(
+                "The word exceeds MyMemory's 500-byte query limit"
+            )
 
-    async def translate(self, word):
-        url = "https://translate.googleapis.com/translate_a/single"
         params = {
-            "client": "gtx",
-            "sl": "auto",
-            "tl": "uk",
-            "dt": "t",
             "q": word,
+            "langpair": MYMEMORY_LANG_PAIR,
         }
 
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-        }
-        async with httpx.AsyncClient(headers=headers, follow_redirects=True) as client:
-            response = await client.get(url=url, params=params)
-            if response.status_code == 200:
+        try:
+            async with httpx.AsyncClient(timeout=10.0) as client:
+                response = await client.get(
+                    MYMEMORY_TRANSLATE_URL,
+                    params=params,
+                )
+                response.raise_for_status()
                 data = response.json()
-                print(data)
-                result = "".join([part[0] for part in data[0] if part[0]])
-                print(result)
-                if result:
-                    payload = TranslationResult(
-                        word=word,
-                        translation=result,
-                        transcription=None,
-                    )
-                    return payload
+        except httpx.HTTPStatusError as error:
+            raise TranslationProviderError(
+                f"MyMemory returned HTTP {error.response.status_code}"
+            ) from error
+        except (httpx.RequestError, ValueError) as error:
+            raise TranslationProviderError(
+                "MyMemory request failed"
+            ) from error
+
+        translated_text = data.get("responseData", {}).get("translatedText")
+        response_status = data.get("responseStatus")
+
+        if response_status != 200:
+            raise TranslationProviderError(
+                f"MyMemory returned status {response_status}"
+            )
+
+        if not isinstance(translated_text, str) or not translated_text.strip():
+            raise TranslationProviderError(
+                "MyMemory returned an empty translation"
+            )
+
+        return TranslationResult(
+            word=word,
+            translation=translated_text,
+            transcription=None,
+        )
