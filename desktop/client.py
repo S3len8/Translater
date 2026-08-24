@@ -1,4 +1,6 @@
 import httpx
+import pyperclip
+
 from desktop.config import ENDPOINT_URL
 
 async def send_to_endpoint1(word: str) -> dict:
@@ -20,3 +22,5 @@ def handle_endpoint1_result(future):
         print(f"Помилка передачі слова на Endpoint 1: {error}")
     else:
         print(f"Endpoint 1 отримав слово: {result}")
+    finally:
+        pyperclip.copy("")

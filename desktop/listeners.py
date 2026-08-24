@@ -48,6 +48,8 @@ def on_click_mouse(x, y, button, pressed, loop):
     print("distance", distance)
     time.sleep(0.12)
 
+    pyperclip.copy("") 
+
     keyboard_controller.press(Key.ctrl_l)
     keyboard_controller.press(KeyCode.from_vk(67))
     keyboard_controller.release(KeyCode.from_vk(67))

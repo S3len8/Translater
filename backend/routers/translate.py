@@ -20,4 +20,8 @@ async def translate(
     return {
         "message": "Translation saved successfully",
         "translation_id": result.id,
+        "word": result.word,
+        "translation": result.translation,
+        "transcription": result.transcription,
+        "score": result.score 
     }
