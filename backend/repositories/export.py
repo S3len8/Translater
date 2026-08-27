@@ -16,3 +16,16 @@ class ExportRepository:
         request = await self.db.execute(select(*model).order_by(TranslationHistory.id))
         history = request.mappings().all()
         return history
+
+    async def get_limited_histories(self, start: int, end: int) -> Sequence[RowMapping]:
+        offset = start - 1
+        limit = end - start + 1
+        model = [
+            TranslationHistory.word,
+            TranslationHistory.translation,
+            TranslationHistory.transcription,
+            TranslationHistory.score,
+        ]
+        request = await self.db.execute(select(*model).offset(offset).limit(limit).order_by(TranslationHistory.id))
+        history = request.mappings().all()
+        return history

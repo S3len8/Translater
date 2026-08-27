@@ -26,3 +26,20 @@ async def create_excel(service: ExportService = Depends(export_service)):
             )
         },
     )
+
+@router.get("/export_limited")
+async def create_excel(
+        start: int,
+        end: int,
+        service: ExportService = Depends(export_service)
+):
+    result = await service.create_excel_limited(start=start, end=end)
+    return StreamingResponse(
+        result,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={
+            "Content-Disposition": (
+                "attachment; filename=translation_history.xlsx"
+            )
+        },
+    )
