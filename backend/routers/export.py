@@ -15,7 +15,7 @@ def export_service(db: AsyncSession = Depends(get_db)) -> ExportService:
 
 
 @router.get("/export")
-async def create_excel(service: ExportService = Depends(export_service)):
+async def export_all_translations(service: ExportService = Depends(export_service)):
     result = await service.create_excel()
     return StreamingResponse(
         result,
@@ -28,12 +28,12 @@ async def create_excel(service: ExportService = Depends(export_service)):
     )
 
 @router.get("/export_limited")
-async def create_excel(
+async def export_translation_range(
         start: int,
         end: int,
         service: ExportService = Depends(export_service)
 ):
-    result = await service.create_excel_limited(start=start, end=end)
+    result = await service.create_excel_for_range(start=start, end=end)
     return StreamingResponse(
         result,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
